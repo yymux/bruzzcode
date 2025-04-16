@@ -50,17 +50,52 @@ def createMap(bombNo): # Creates a map which the buttons reference when deciding
         print("\n")
 
 # --------------------- MODULE 2 ----------------------
+
+def numberDict(num): # Returns the color of the number based on the number of bombs around it
+
+    if num == 1:
+        return "blue"
     
+    elif num == 2:
+        return "green"
+    
+    elif num == 3:
+        return "red"
+    
+    elif num == 4:
+        return "purple"
+    
+    elif num == 5:
+        return "brown"
+    
+    elif num == 6:
+        return "cyan"
+    
+    elif num == 7:
+        return "black"
+    
+    elif num == 8:
+        return "grey"
+    
+    else:
+        return "black"
+
 def revealSpace(i, j): # Reveals the space when clicked, and checks if it is a bomb or not
 
+    global flagsPlaced
     checkGameStatus()
     if flagMode: # If flag mode is activated, toggle the flag on the button
         if str(buttons[i][j]["text"]).isdigit(): # If the button is already revealed, end it
             return
         if buttons[i][j]["text"] == "F":# If the button is flagged, unflag it
-            buttons[i][j].config(text=" ", bg="lightgrey")
+            buttons[i][j].config(text=" ", bg="#77DD77")
+            flagsPlaced -= 1 # Decrease the number of flags placed
         else: # If the button is not flagged, flag it
+            if flagsPlaced >= BOMB_NUMBER: # If the number of flags placed is greater than or equal to the number of bombs, do nothing
+                return
             buttons[i][j].config(text="F", bg="yellow")
+            flagsPlaced += 1
+
         return
     
     else: # If flag mode is not activated, reveal the space
@@ -75,8 +110,8 @@ def revealSpace(i, j): # Reveals the space when clicked, and checks if it is a b
             return
         
         else: # If not, use the map to sbow the number of bombs around it,if any
-            buttons[i][j].config(text=map[i][j], bg="white")
-
+            colour = numberDict(map[i][j]) # Calls the numberDict function to get the color of the number
+            buttons[i][j].config(text=map[i][j], bg="#F5F5DC", fg=colour) # Shows the number of bombs around it, if any
         # If the current space is 0, reveal all adjacent spaces
         if map[i][j] == 0:
             for k in range(-1, 2):
@@ -138,7 +173,7 @@ def restart(event): # Resets the game when space is pressed after game over
     bombCoordinates = [] # Resets the bomb coordinates
     for button in buttons: # Resets the buttons
         for b in button:
-            b.config(text=" ", bg="lightgrey", state="normal")
+            b.config(text=" ", bg="#77DD77", state="normal")
 
     description.config(text="Flag mode is disabled") # Resets the description label
     createMap(BOMB_NUMBER) # Creates a new map with 13 bombs
@@ -151,9 +186,10 @@ map = [] # List to store the map
 buttons = [] # List to store the buttons
 flagMode = False # Flag mode is disabled by default
 keyPressed = False  # Flag to track if the key is already pressed
-BOMB_NUMBER = 5 # Default number of bombs
+BOMB_NUMBER = 13 # Default number of bombs
 bombCoordinates = [] # List of bomb coordinates
 helpOpened = False # Flag to track if the help window is already opened
+flagsPlaced = 0 # Number of flags placed
 
 def toggleFlag(event): # Allows the user to toggle flag mode on and off by pressing the space key
 
@@ -171,11 +207,13 @@ def resetKey(event): # Stops the flag from being toggled multiple times when the
     global keyPressed
     keyPressed = False  # Reset the keyPressed flag when the key is released
 
+
+
 # -------------------- MODULE 1 --------------------
 for i in range(10): # Creates the buttons and adds them to the grid
     row = [] 
     for j in range(10): # Creates 10 buttons in each row
-        button = tk.Button(root, text=" ", width=3, height=1,bg="lightgrey") # Creates the button with a light grey background
+        button = tk.Button(root, text=" ", width=3, height=1,bg="#77DD77") # Creates the button with a green background
         button.config(command=lambda i=i, j=j: revealSpace(i, j)) # Sets the command to reveal the space when clicked
         button.grid(row=i, column=j) # Adds the button to the grid
         row.append(button) 
